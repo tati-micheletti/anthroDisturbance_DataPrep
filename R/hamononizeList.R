@@ -17,9 +17,7 @@ hamononizeList <- function(disturbanceList, whatNotToCombine){
       toGoOverNow <- DT[names(DT) %in% toGoOver]
       # Find out which names are repeated
       dups <- unique(names(toGoOverNow)[duplicated(names(toGoOverNow))])
-      if (length(dups) > 1){
-        toAddLater <- c(toAddLater, toGoOverNow[!names(toGoOverNow) %in% dups])
-      }
+      toAddLater <- c(toAddLater, toGoOverNow[!names(toGoOverNow) %in% dups])
       if (length(dups) == 0){
         DT <- c(toAddLater, toGoOverNow)
         message(crayon::green(paste0("Returning ", sectors, " unchanged.")))
