@@ -218,7 +218,7 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
         tList <- qs::qread(fileName)
         sim$disturbances <- unwrapTerraList(tList)
       } else {
-        sim$disturbances <- createdisturbances(DT = sim[["disturbanceDT"]],
+        sim$disturbances <- createDisturbanceList(DT = sim[["disturbanceDT"]],
                                                      destinationPath = dataPath(sim),
                                                      studyArea = sim$studyArea,
                                                      rasterToMatch = sim$rasterToMatch)
