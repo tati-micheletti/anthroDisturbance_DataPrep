@@ -1,9 +1,9 @@
-hamononizeList <- function(disturbanceList, whatNotToCombine){
-  if (is.null(disturbanceList)) stop("disturbanceList can't be NULL")
+hamononizeList <- function(disturbances, whatNotToCombine){
+  if (is.null(disturbances)) stop("disturbances can't be NULL")
   # Now that the datset is ready, we need to harmonize the ones with the same names
-  harmonizedList <- lapply(names(disturbanceList), function(sectors){
+  harmonizedList <- lapply(names(disturbances), function(sectors){
     message(paste0("Harmonizing ", sectors))
-    DT <- disturbanceList[[sectors]]
+    DT <- disturbances[[sectors]]
     if (suppressWarnings(all(all(unique(names(DT)) == names(DT)),
                          length(unique(names(DT))) == length(names(DT))))){
       message(crayon::green(paste0("Returning ", sectors, " unchanged.")))
@@ -35,6 +35,6 @@ hamononizeList <- function(disturbanceList, whatNotToCombine){
       }
     }
   })
-  names(harmonizedList) <- names(disturbanceList)
+  names(harmonizedList) <- names(disturbances)
   return(harmonizedList)
 }
