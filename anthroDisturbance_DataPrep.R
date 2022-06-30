@@ -48,7 +48,7 @@ defineModule(sim, list(
                     "Should caching of events or module be used?"),
     defineParameter("whatNotToCombine", "character", "potential", NA, NA,
                     paste0("Here the user should specify which dataClass from ",
-                           "the object disturbanceList should NOT be combined.",
+                           "the object disturbances should NOT be combined.",
                            "This is especially important for potential resource ",
                            "layers that need idiosyncratic processes to be ",
                            "generated, which might happen on a separate module (",
@@ -58,7 +58,7 @@ defineModule(sim, list(
                            "harmonization of the datasets.")
                     ),
     defineParameter("useSavedList", "logical", TRUE, NA, NA,
-                    paste0("If the disturbanceList object was saved and the parameter",
+                    paste0("If the disturbances object was saved and the parameter",
                            "is TRUE, it returns the list. Saves time but attention ",
                            "is needed to make sure the objects are correct!"))
   ),
@@ -140,14 +140,14 @@ defineModule(sim, list(
                  sourceURL = "https://drive.google.com/file/d/11yCDc2_Wia2iw_kz0f0jOXrLpL8of2oM/view?usp=sharing")
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = "disturbanceList", objectClass = "list", 
+    createsOutput(objectName = "disturbances", objectClass = "list", 
                   desc = paste0("List (general category) of lists (specific ",
                                 "class) needed for generating ",
                                 "disturbances. This last list contains: ",
                                 "Outter list names: dataName from disturbanceDT",
                                 "Inner list names: dataClass from disturbanceDT, ",
                                 "which is a unique class")),
-    createsOutput(objectName = "harmonizedList", objectClass = "list",
+    createsOutput(objectName = "disturbanceList", objectClass = "list",
                   desc = paste0("List (general category) of lists (specific ",
                                 "class) needed for generating ",
                                 "disturbances. This last list contains: ",
@@ -212,24 +212,24 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
     },
     loadAndHarmonizeDisturbanceDT = {
       
-      fileName <- file.path(dataPath(sim), "disturbanceList.qs")
+      fileName <- file.path(dataPath(sim), "disturbances.qs")
       
       if (all(file.exists(fileName), P(sim)$useSavedList)){
         tList <- qs::qread(fileName)
-        sim$disturbanceList <- unwrapTerraList(tList)
+        sim$disturbances <- unwrapTerraList(tList)
       } else {
-        sim$disturbanceList <- createDisturbanceList(DT = sim[["disturbanceDT"]],
+        sim$disturbances <- createdisturbances(DT = sim[["disturbanceDT"]],
                                                      destinationPath = dataPath(sim),
                                                      studyArea = sim$studyArea,
                                                      rasterToMatch = sim$rasterToMatch)
         
-        tList <- wrapTerraList(terraList = sim$disturbanceList,
+        tList <- wrapTerraList(terraList = sim$disturbances,
                                generalPath = file.path(Paths$modulePath,
                                                        "anthroDisturbance_DataPrep/data"))
         qs::qsave(tList, fileName)
       }
       
-      sim$harmonizedList <- hamononizeList(disturbanceList = sim$disturbanceList, 
+      sim$disturbanceList <- hamononizeList(disturbances = sim$disturbances, 
                                            whatNotToCombine = P(sim)$whatNotToCombine)
     },
     warning(paste("Undefined event type: \'", current(sim)[1, "eventType", with = FALSE],
