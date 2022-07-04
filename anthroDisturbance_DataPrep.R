@@ -60,7 +60,19 @@ defineModule(sim, list(
     defineParameter("useSavedList", "logical", TRUE, NA, NA,
                     paste0("If the disturbances object was saved and the parameter",
                            "is TRUE, it returns the list. Saves time but attention ",
-                           "is needed to make sure the objects are correct!"))
+                           "is needed to make sure the objects are correct!")),
+    defineParameter("skipFixErrors", "character", 
+                    c("NT_FORCOV.shp", 
+                      "NorthwestTerritories_15m_Disturb_Perturb_Poly.shp",
+                      "polygonalDisturbances_NT1_BCR6_clipped.shp",
+                      "NorthwestTerritories_15m_Disturb_Perturb_Line.shp",
+                      "linearDisturbances_NT1_BCR6_clipped.shp"), NA, NA,
+                    paste0("Some polygons have errors that are automatically fixed ",
+                           "in createDistubanceList(). However, some polygons ",
+                           "are fine and too big to be checked. Here you can pass ",
+                           "the name of the files you believe are correct, ",
+                           "but would take a long time to be checked. ",
+                           "This will skip fixErrors() for these files."))
   ),
   inputObjects = bindrows(
     expectsInput(objectName = "disturbanceDT", objectClass = "data.table", 
@@ -221,7 +233,8 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
         sim$disturbances <- createDisturbanceList(DT = sim[["disturbanceDT"]],
                                                      destinationPath = dataPath(sim),
                                                      studyArea = sim$studyArea,
-                                                     rasterToMatch = sim$rasterToMatch)
+                                                     rasterToMatch = sim$rasterToMatch,
+                                                  skipFixErrors = P(sim)$skipFixErrors)
         
         tList <- wrapTerraList(terraList = sim$disturbances,
                                generalPath = file.path(Paths$modulePath,

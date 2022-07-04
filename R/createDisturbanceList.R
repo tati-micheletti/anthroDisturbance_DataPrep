@@ -1,7 +1,8 @@
 createDisturbanceList <- function(DT, 
                         destinationPath, 
                         studyArea, 
-                        rasterToMatch){
+                        rasterToMatch,
+                        skipFixErrors){
   # lapply over dataName, then over dataClass, and then over the classToSearch 
   # 1. Download data, place it in module's data folder
   # 2. Make the layer, reproj to RTM, crop to SA
@@ -94,7 +95,11 @@ oneLay <- lapply(1:NROW(subDT1), function(index){
                       alsoExtract = AE,
                       destinationPath = intDir, 
                       fun = FUN, 
-                      overwrite = FALSE, purge = 7)
+                      overwrite = FALSE)
+    if (!TF %in% skipFixErrors){
+      lay <- fixErrors(lay) # Some polygons have errors, so we have to fix them
+      # While prepInputs can't deal completely with terra
+    }
     if (class(lay) == "RasterLayer"){
       lay <- terra::rast(lay) 
     }
