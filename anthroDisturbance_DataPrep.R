@@ -28,7 +28,7 @@ defineModule(sim, list(
   documentation = list("README.md", "anthroDisturbance_DataPrep.Rmd"), ## same file
   reqdPkgs = list("SpaDES.core (>=1.0.10)", "ggplot2", 
                   "PredictiveEcology/reproducible@development",
-                  "raster", "terra", "crayon"),
+                  "raster", "terra", "crayon", "stringi"),
   parameters = rbind(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
     defineParameter(".plots", "character", "screen", NA, NA,
@@ -258,6 +258,8 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
 
   if (!suppliedElsewhere(object = "studyArea", sim = sim)) {
     sim$studyArea <- prepInputs(url = extractURL("studyArea"),
+                                targetFile = "NT1_BCR6.shp",
+                                alsoExtract = "similar",
                                 destinationPath = dPath)
     
     warning(paste0("studyArea was not supplied. Defaulting to BCR6+NT1 in the",
@@ -275,10 +277,11 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
   
   if (!suppliedElsewhere(object = "disturbanceDT", sim = sim)) {
     sim$disturbanceDT <- prepInputs(url = extractURL("disturbanceDT"),
+                                    targetFile = "disturbanceDT.csv",
                                     destinationPath = dPath,
                                     fun = "data.table::fread",
                                     header = TRUE, 
-                                    userTags = "disturbanceDT", purge = 7)
+                                    userTags = "disturbanceDT")
     
     warning(paste0("disturbanceDT was not supplied. Defaulting to an example from ",
                    " Northwest Territories"), immediate. = TRUE)
