@@ -29,17 +29,33 @@ For help writing in R Markdown, see https://rmarkdown.rstudio.com/.
 # Usage
 
 ```{r module_usage}
-library("SpaDES.core")
+if(!require("Require")){
+    install.packages("Require")
+}
+library("Require")
+Require("googledrive")
+Require("SpaDES.core")
 
 # Pass your email for authentication (used for non-interactive calls)
 googledrive::drive_auth(email = "tati.micheletti@gmail.com")
 options(reproducible.useTerra = FALSE) # Workaround while reproducible is not yet fully functional with terra
 
-setPaths(modulePath = file.path("C:/Users/Tati/Documents/GitHub"),
-         cachePath = file.path("C:/Users/Tati/Documents/GitHub/anthroDisturbance_DataPrep/cache"))
+# If you load the project, set the directory where your modules are located 
+moduleDir <- dirname(getwd())
+  
+setPaths(modulePath = moduleDir,
+         cachePath = checkPath(file.path(getwd(), "cache"), 
+                               create = TRUE), 
+         outputPath = checkPath(file.path(getwd(), "outputs"), 
+                               create = TRUE),
+         inputPath = checkPath(file.path(getwd(), "inputs"), 
+                               create = TRUE),
+         rasterPath = checkPath(file.path(getwd(), "temp_raster"), 
+                               create = TRUE))
+
 getPaths() # shows where the 4 relevant paths are
 
-times <- list(start = 1, end = 1)
+times <- list(start = 2011, end = 2011)
 
 parameters <- list(
   #.progress = list(type = "text", interval = 1), # for a progress bar
