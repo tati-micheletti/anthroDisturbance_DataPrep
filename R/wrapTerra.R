@@ -34,6 +34,7 @@ wrapTerraList <- function(terraList, generalPath, zipFiles = FALSE, uploadZip = 
 }
 
 unwrapTerraList <- function(terraList, generalPath = NULL){
+  updatePath <- FALSE
   if (!is.list(terraList)) {
     message(paste0("The terraList file provided seems to be a google drive link. The contents will be",
                    " downloaded and extracted before recovering."))
