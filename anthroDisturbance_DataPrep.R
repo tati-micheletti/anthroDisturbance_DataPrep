@@ -281,7 +281,7 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
                                     destinationPath = dPath,
                                     fun = "data.table::fread",
                                     header = TRUE, 
-                                    userTags = "disturbanceDT")
+                                    userTags = "disturbanceDT", purge = 7)
     
     warning(paste0("disturbanceDT was not supplied. Defaulting to an example from ",
                    " Northwest Territories"), immediate. = TRUE)
