@@ -158,7 +158,7 @@ defineModule(sim, list(
                                 "disturbances. This last list contains: ",
                                 "Outter list names: dataName from disturbanceDT",
                                 "Inner list names: dataClass from disturbanceDT, ",
-                                "which is a unique class")),
+                                "which might not be an unique class")),
     createsOutput(objectName = "disturbanceList", objectClass = "list",
                   desc = paste0("List (general category) of lists (specific ",
                                 "class) needed for generating ",
