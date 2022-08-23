@@ -57,8 +57,8 @@ parameters <- list(
                       "NorthwestTerritories_15m_Disturb_Perturb_Poly.shp",
                       "polygonalDisturbances_NT1_BCR6_clipped.shp",
                       "NorthwestTerritories_15m_Disturb_Perturb_Line.shp",
-                      "linearDisturbances_NT1_BCR6_clipped.shp")),
-)
+                      "linearDisturbances_NT1_BCR6_clipped.shp"))
+  )
 modules <- list("anthroDisturbance_DataPrep")
 objects <- list()
 inputs <- list()
