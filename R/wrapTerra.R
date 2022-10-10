@@ -33,7 +33,7 @@ wrapTerraList <- function(terraList, generalPath, zipFiles = FALSE, uploadZip = 
   return(listNames)
 }
 
-unwrapTerraList <- function(terraList, generalPath = NULL){
+unwrapTerraList <- function(terraList, generalPath){
   updatePath <- FALSE
   if (all(!is.list(terraList),
           !file.exists(file.path(generalPath, "theList.qs")))) {
@@ -50,7 +50,11 @@ unwrapTerraList <- function(terraList, generalPath = NULL){
   } else {
     if (all(!is.list(terraList),
             file.exists(file.path(generalPath, "theList.qs")))){
+      # When the path to the object is being passed
       terraList <- qs::qread(file.path(generalPath, "theList.qs"))
+      updatePath <- TRUE
+    } else {
+      # When the object is directly being passed
       updatePath <- TRUE
     }
   }
