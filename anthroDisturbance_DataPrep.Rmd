@@ -3,6 +3,7 @@ title: "anthroDisturbance_DataPrep"
 author: "Tati Micheletti"
 date: "16 June 2022"
 output:
+  pdf_document: default
   html_document:
     keep_md: yes
 editor_options:
@@ -74,7 +75,7 @@ disturbanceList <- simInitAndSpades(times = times,
 
 This module has a couple parameters that can be adjusted by the user. 
 
-```{r moduleParams, echo = FALSE, eval = TRUE}
+```{r moduleParams}
 df_params <- SpaDES.core::moduleParams("anthroDisturbance_DataPrep", moduleDir)
 knitr::kable(df_params)
 ```
@@ -117,7 +118,7 @@ The `disturbanceDT` data table contains the following columns:
 - `dataType`: Provide the data type of the layer to be used. These are the current accepted  formats: 'shapefile' (.shp or .gdb), 'raster' (.tif, which will be converted into shapefile), and 'mif' (which will be read as a shapefile). The last defaults to an example in the Northwest Territories and needs to be provided if the study area is not in this region (i.e., union of BCR6 and NT1).  
 Other inputs needed by this module are the the study area (`studyArea`) and a raster (`rasterToMatch``) that matches the study area and provides the spatial resolution for the simulations.  
 
-```{r moduleInputs, echo = FALSE, eval = TRUE}
+```{r moduleInputs}
 df_inputs <- SpaDES.core::moduleInputs("anthroDisturbance_DataPrep", moduleDir)
 knitr::kable(df_inputs)
 ```
@@ -134,7 +135,7 @@ The module outputs the following objects:
   + Outter list's names: `dataName` from `disturbanceDT`;  
   + Inner list's names: `dataClass` from `disturbanceDT`, which is a unique class after harmozining, except for any potential resources that need idiosyncratic processing. This means that each combination of `dataName` and `dataClass` (except for 'potential') will have only one element. Another module can deal with the potential layers. For the current defaults, this is the `potentialResourcesNT_DataPrep`. If none of the potential layers needs to be modified or combined, you might skip this idiosyncratic module and directly use the `anthroDisturbance_Generator` module.
 
-```{r moduleOutputs, echo = FALSE, eval = TRUE}
+```{r moduleOutputs}
 df_outputs <- SpaDES.core::moduleOutputs("anthroDisturbance_DataPrep", moduleDir)
 knitr::kable(df_outputs)
 ```
