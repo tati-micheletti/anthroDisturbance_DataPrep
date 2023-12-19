@@ -26,8 +26,8 @@ defineModule(sim, list(
   timeunit = "year",
   citation = list("citation.bib"),
   documentation = list("README.md", "anthroDisturbance_DataPrep.Rmd"), ## same file
-  reqdPkgs = list("SpaDES.core (>=1.0.10)", "ggplot2", 
-                  "PredictiveEcology/reproducible@development",
+  reqdPkgs = list("SpaDES.core (>=2.0.3.9002)", "ggplot2", 
+                  "PredictiveEcology/reproducible",
                   "raster", "terra", "crayon", "stringi"),
   parameters = rbind(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
@@ -139,13 +139,13 @@ defineModule(sim, list(
                                "of BCR6 and NT1)"), 
                  sourceURL = "https://drive.google.com/file/d/1wHIz_G088T66ygLK9i89NJGuwO3f6oIu/view?usp=sharing"),
     expectsInput(objectName = "studyArea", 
-                 objectClass = "SpatialPolygonDataFrame|vect", 
+                 objectClass = "SpatialPolygonDataFrame|SpatVector", 
                  desc = paste0("Study area to which the module should be ",
                                "constrained to. Defaults to NT1+BCR6. Object ",
                                "can be of class 'vect' from terra package"), 
                  sourceURL = "https://drive.google.com/file/d/1RPfDeHujm-rUHGjmVs6oYjLKOKDF0x09/view?usp=sharing"),
     expectsInput(objectName = "rasterToMatch", 
-                 objectClass = "RasterLayer|rast", 
+                 objectClass = "RasterLayer|SpatRaster", 
                  desc = paste0("All spatial outputs will be reprojected and ",
                                "resampled to it. Defaults to NT1+BCR6. Object ",
                                "can be of class 'rast' from terra package"), 
@@ -224,21 +224,20 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
     },
     loadAndHarmonizeDisturbanceDT = {
       
-      fileName <- file.path(dataPath(sim), "disturbances.qs")
+      fileName <- file.path(Paths[["outputPath"]], "disturbances.qs")
       
       if (all(file.exists(fileName), P(sim)$useSavedList)){
         tList <- qs::qread(fileName)
         sim$disturbances <- unwrapTerraList(tList)
       } else {
         sim$disturbances <- createDisturbanceList(DT = sim[["disturbanceDT"]],
-                                                     destinationPath = dataPath(sim),
+                                                     destinationPath = Paths[["outputPath"]],
                                                      studyArea = sim$studyArea,
                                                      rasterToMatch = sim$rasterToMatch,
                                                   skipFixErrors = P(sim)$skipFixErrors)
         
         tList <- wrapTerraList(terraList = sim$disturbances,
-                               generalPath = file.path(Paths$modulePath,
-                                                       "anthroDisturbance_DataPrep/data"))
+                               generalPath = dataPath(sim))
         qs::qsave(tList, fileName)
       }
       

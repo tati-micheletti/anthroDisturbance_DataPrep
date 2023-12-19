@@ -74,7 +74,7 @@ oneLay <- lapply(1:NROW(subDT1), function(index){
       # })
       allTiles <- list.files(path = intDir, pattern = ".mif", full.names = TRUE)
       allLays <- lapply(allTiles, function(Lay){
-        lay <- rgdal::readOGR(Lay)
+        lay <- rmndt::readMIF(Lay)
         lay <- terra::vect(lay)
         layR <- terra::project(x = lay, studyArea)
         croppedLay <- crop(layR, studyArea)
