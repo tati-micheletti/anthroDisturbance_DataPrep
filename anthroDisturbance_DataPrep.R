@@ -27,7 +27,7 @@ defineModule(sim, list(
   citation = list("citation.bib"),
   documentation = list("README.md", "anthroDisturbance_DataPrep.Rmd"), ## same file
   reqdPkgs = list("SpaDES.core (>=2.0.3.9002)", "ggplot2", 
-                  "PredictiveEcology/reproducible",
+                  "PredictiveEcology/reproducible", "tictoc",
                   "raster", "terra", "crayon", "stringi"),
   parameters = rbind(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
@@ -46,6 +46,11 @@ defineModule(sim, list(
                     "Named list of seeds to use for each event (names)."),
     defineParameter(".useCache", "logical", FALSE, NA, NA,
                     "Should caching of events or module be used?"),
+    defineParameter("studyAreaName", "character", "NT1", NA, NA,
+                    "Name to be used to save interin disturbance layers, related to location"),
+    defineParameter("checkDisturbanceProportions", "logical", FALSE, NA, NA,
+                    paste0("Should the disturbances from the original data be pre-buffered to calculate area?",
+                           " Mainly designed for debugging and information on original data.")),
     defineParameter("whatNotToCombine", "character", "potential", NA, NA,
                     paste0("Here the user should specify which dataClass from ",
                            "the object disturbances should NOT be combined.",
@@ -56,23 +61,11 @@ defineModule(sim, list(
                            "is used as a pattern string to identify which dataClass ",
                            "contains the pattern and excludes these from the ",
                            "harmonization of the datasets.")
-                    ),
+    ),
     defineParameter("useSavedList", "logical", TRUE, NA, NA,
                     paste0("If the disturbances object was saved and the parameter",
                            "is TRUE, it returns the list. Saves time but attention ",
-                           "is needed to make sure the objects are correct!")),
-    defineParameter("skipFixErrors", "character", 
-                    c("NT_FORCOV.shp", 
-                      "NorthwestTerritories_15m_Disturb_Perturb_Poly.shp",
-                      "polygonalDisturbances_NT1_BCR6_clipped.shp",
-                      "NorthwestTerritories_15m_Disturb_Perturb_Line.shp",
-                      "linearDisturbances_NT1_BCR6_clipped.shp"), NA, NA,
-                    paste0("Some polygons have errors that are automatically fixed ",
-                           "in createDistubanceList(). However, some polygons ",
-                           "are fine and too big to be checked. Here you can pass ",
-                           "the name of the files you believe are correct, ",
-                           "but would take a long time to be checked. ",
-                           "This will skip fixErrors() for these files."))
+                           "is needed to make sure the objects are correct!"))
   ),
   inputObjects = bindrows(
     expectsInput(objectName = "disturbanceDT", objectClass = "data.table", 
@@ -132,7 +125,7 @@ defineModule(sim, list(
                                " formats: 'shapefile' (.shp or .gdb), 'raster' ",
                                "(.tif, which will be converted into shapefile), ",
                                "and 'mif' (which will be read as a shapefile).",
-
+                               
                                "It defaults to an example in the Northwest ",
                                "Territories and needs to be provided if the ",
                                "study area is not in this region (i.e., union ",
@@ -186,7 +179,7 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
   switch(
     eventType,
     init = {
-
+      
       ### Make sure that both studyArea and rasterToMatch are in terra format
       if (class(sim$rasterToMatch) != "SpatRaster"){
         message(crayon::yellow("rasterToMatch is not a SpatRaster. Converting."))
@@ -215,34 +208,24 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
           stop(e)
         })
       }
-
+      
       # schedule future event(s)
       sim <- scheduleEvent(sim = sim, 
                            eventTime = start(sim), 
                            moduleName = "anthroDisturbance_DataPrep", 
-                           eventType = "loadAndHarmonizeDisturbanceDT")
+                           eventType = "loadAndHarmonizeDisturbanceDT", eventPriority = 2)
     },
     loadAndHarmonizeDisturbanceDT = {
       
-      fileName <- file.path(Paths[["outputPath"]], "disturbances.qs")
-      
-      if (all(file.exists(fileName), P(sim)$useSavedList)){
-        tList <- qs::qread(fileName)
-        sim$disturbances <- unwrapTerraList(tList)
-      } else {
         sim$disturbances <- createDisturbanceList(DT = sim[["disturbanceDT"]],
-                                                     destinationPath = Paths[["outputPath"]],
-                                                     studyArea = sim$studyArea,
-                                                     rasterToMatch = sim$rasterToMatch,
-                                                  skipFixErrors = P(sim)$skipFixErrors)
-        
-        tList <- wrapTerraList(terraList = sim$disturbances,
-                               generalPath = dataPath(sim))
-        qs::qsave(tList, fileName)
-      }
+                                                  destinationPath = getOption("reproducible.destinationPath"), #Paths[["outputPath"]],
+                                                  studyArea = sim$studyArea,
+                                                  studyAreaName = P(sim)$studyAreaName,
+                                                  rasterToMatch = sim$rasterToMatch,
+                                                  checkDisturbanceProportions = P(sim)$checkDisturbanceProportions)
       
       sim$disturbanceList <- hamononizeList(disturbances = sim$disturbances, 
-                                           whatNotToCombine = P(sim)$whatNotToCombine)
+                                            whatNotToCombine = P(sim)$whatNotToCombine)
     },
     warning(paste("Undefined event type: \'", current(sim)[1, "eventType", with = FALSE],
                   "\' in module \'", current(sim)[1, "moduleName", with = FALSE], "\'", sep = ""))
@@ -252,7 +235,8 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
 
 .inputObjects <- function(sim) {
   #cacheTags <- c(currentModule(sim), "function:.inputObjects") ## uncomment this if Cache is being used
-  dPath <- asPath(getOption("reproducible.destinationPath", dataPath(sim)), 1)
+  # dPath <- asPath(getOption("reproducible.destinationPath", dataPath(sim)), 1)
+  dPath <- dataPath(sim)
   message(currentModule(sim), ": using dataPath '", dPath, "'.")
 
   if (!suppliedElsewhere(object = "studyArea", sim = sim)) {
@@ -269,7 +253,7 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
     sim$rasterToMatch <- prepInputs(url = extractURL("rasterToMatch"),
                                     targetFile = "RTM.tif",
                                     destinationPath = dPath)
-
+    
     warning(paste0("rasterToMatch was not supplied. Defaulting to BCR6+NT1 in the",
                    " Northwest Territories"), immediate. = TRUE)
   }
