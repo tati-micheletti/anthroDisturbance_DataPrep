@@ -21,7 +21,7 @@ defineModule(sim, list(
                                 comment = NULL)), 
                       class = "person"),
   childModules = character(0),
-  version = list(anthroDisturbance_DataPrep = "0.0.1"),
+  version = list(anthroDisturbance_DataPrep = "1.0.0"),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list("citation.bib"),
