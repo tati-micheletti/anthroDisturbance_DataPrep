@@ -3,7 +3,7 @@ Energy,windTurbineDB,,windTurbines,wind_turbine_database_en.gdb.zip,gdb,https://
 Energy,E1,,potentialWindTurbines,windLayers_NWT.zip,mif,https://drive.google.com/file/d/1g0AmAN_8RpM4x7tKHl191aTNMJRNszYA/view?usp=sharing
 Energy,Powerline,Class,powerLines,NorthwestTerritories_15m_Disturb_Perturb_Line.shp,shapefile,https://drive.google.com/file/d/1hl7bF0JJsF8AQzZIZ0QfoDwvvAq81UpP/view?usp=sharing
 Energy,Powerline,Class,powerLines,linearDisturbances_NT1_BCR6_clipped.shp,shapefile,https://drive.google.com/file/d/1_H9Y-AZe-NmKCmqU0RpuZh04moiHf8l7/view?usp=sharing
-oilGas,ITI,,potentialOilGas,ECO_ITI_PR_OilandGasRights_GSC_NAD83.shp,shapefile,https://www.iti.gov.nt.ca/sites/iti/files/ECO_ITI_PR_OilandGasRights_GCS_NAD27_Jan26_2023_0.zip
+oilGas,ITI,,potentialOilGas,ECO_ITI_PR_OilandGasRights_GCS_NAD27.shp,shapefile,https://www.iti.gov.nt.ca/sites/iti/files/ECO_ITI_PR_OilandGasRights_GCS_NAD27_Jan26_2023_0.zip
 oilGas,hydroPotential,,potentialOilGas,C2H4_BCR6_NT1.tif,raster,https://drive.google.com/file/d/1Uxbp7RU01WUraZRuv9qiP9QNgRDUGsoU/view?usp=sharing
 oilGas,Seismic,Class,seismicLines,linearDisturbances_NT1_BCR6_clipped.shp,shapefile,https://drive.google.com/file/d/1_H9Y-AZe-NmKCmqU0RpuZh04moiHf8l7/view?usp=sharing
 oilGas,Seismic,Class,seismicLines,NorthwestTerritories_15m_Disturb_Perturb_Line.shp,shapefile,https://drive.google.com/file/d/1hl7bF0JJsF8AQzZIZ0QfoDwvvAq81UpP/view?usp=sharing
