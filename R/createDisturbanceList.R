@@ -21,6 +21,7 @@ createDisturbanceList <- function(DT,
                                       ": ", DC)))
         
         oneLay <- lapply(1:NROW(subDT1), function(index){
+
           subDT <- subDT1[index,]
           if (any(is.na(subDT[["URL"]]), 
                   is.null(subDT[["URL"]]), 
