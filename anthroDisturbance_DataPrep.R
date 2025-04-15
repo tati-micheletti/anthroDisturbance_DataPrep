@@ -130,7 +130,7 @@ defineModule(sim, list(
                                "Territories and needs to be provided if the ",
                                "study area is not in this region (i.e., union ",
                                "of BCR6 and NT1)"), 
-                 sourceURL = "https://drive.google.com/file/d/1wHIz_G088T66ygLK9i89NJGuwO3f6oIu/view?usp=sharing"),
+                 sourceURL = "https://raw.githubusercontent.com/tati-micheletti/anthroDisturbance_DataPrep/refs/heads/main/data/disturbanceDT.csv"),
     expectsInput(objectName = "studyArea", 
                  objectClass = "SpatialPolygonDataFrame|SpatVector", 
                  desc = paste0("Study area to which the module should be ",
@@ -216,7 +216,6 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
                            eventType = "loadAndHarmonizeDisturbanceDT", eventPriority = 2)
     },
     loadAndHarmonizeDisturbanceDT = {
-      
         sim$disturbances <- createDisturbanceList(DT = sim[["disturbanceDT"]],
                                                   destinationPath = getOption("reproducible.destinationPath"), #Paths[["outputPath"]],
                                                   studyArea = sim$studyArea,
@@ -259,13 +258,9 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
   }
   
   if (!suppliedElsewhere(object = "disturbanceDT", sim = sim)) {
-    sim$disturbanceDT <- prepInputs(url = extractURL("disturbanceDT"),
-                                    targetFile = "disturbanceDT.csv",
-                                    destinationPath = dPath,
-                                    fun = "data.table::fread",
-                                    header = TRUE, 
-                                    userTags = "disturbanceDT")
     
+    sim$disturbanceDT <- data.table::fread(extractURL("disturbanceDT"))
+
     warning(paste0("disturbanceDT was not supplied. Defaulting to an example from ",
                    " Northwest Territories"), immediate. = TRUE)
   }
