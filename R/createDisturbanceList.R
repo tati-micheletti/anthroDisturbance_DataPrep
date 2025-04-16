@@ -44,8 +44,9 @@ createDisturbanceList <- function(DT,
                           sep = "_")
           intDir <- checkPath(file.path(destinationPath, flName),
                               create = TRUE)
-          # 2. Check for final file. If doesn't exist, create:
-          fullFlName <- file.path(intDir, paste0(flName, ".shp"))
+
+          saDigest <- digest::digest(studyArea)
+          fullFlName <- file.path(intDir, paste0(flName, "_", saDigest, ".shp"))
           
           if (!file.exists(fullFlName)){
             message(paste0(flName, " doesn't exist, creating..."))
@@ -61,30 +62,14 @@ createDisturbanceList <- function(DT,
                 download.file(url = subDT[["URL"]], destfile = file.path(intDir, subDT[["fileName"]]))
                 unzip(zipfile = list.files(intDir, full.names = TRUE, pattern = ".zip"), exdir = intDir)
               }
-              # BELOW DOESN'T WORK WITH THE NEWEST VERSION OF REPRODUCIBLE!
-              # downLays <- tryCatch({
-              #   preProcess(url = subDT[["URL"]],
-              #              archieve = subDT[["fileName"]],
-              #              alsoExtract = NULL,
-              #              destinationPath = checkPath(intDir,
-              #                                          create = TRUE))
-              # }, error = function(e){
-              #   flsExist <- list.files(path = intDir, pattern = ".mif", full.names = TRUE)
-              #   if (length(flsExist) != 0) message("Layers present in directory: ",
-              #                                      paste(basename(flsExist),
-              #                                            collapse = "; ")
-              #   ) else
-              #     stop(paste0("Something went wrong. Please check that the URL is still",
-              #                 " active and you have been granted access. Another option is ",
-              #                 "that the fileName in the disturbance table does not match the ",
-              #                 "zip file (it shouldn't match any internal files!)"))
-              # })
+
               allTiles <- list.files(path = intDir, pattern = ".mif", full.names = TRUE)
               allLays <- lapply(allTiles, function(Lay){
                 lay <- terra::vect(Lay)
                 layR <- terra::project(x = lay, studyArea)
                 croppedLay <- terra::crop(layR, studyArea)
                 maskedLay <- terra::mask(croppedLay, studyArea)
+
                 # We need to convert to raster because there are tiles in the shapefiles
                 # and union takes too long
                 if (NROW(maskedLay) == 0) return(NULL) # For small study areas, one of the tiles might
@@ -117,6 +102,7 @@ createDisturbanceList <- function(DT,
                                 destinationPath = intDir, 
                                 fun = FUN, 
                                 overwrite = FALSE)
+              
               if (length(lay) == 0){
                   message(crayon::red(paste0("There are no ", DC, 
                                              ifelse(CTS == "", 
