@@ -1,4 +1,4 @@
-hamononizeList <- function(disturbances, whatNotToCombine){
+harmonizeList <- function(disturbances, whatNotToCombine){
   if (is.null(disturbances)) stop("disturbances can't be NULL")
   # Now that the datset is ready, we need to harmonize the ones with the same names
   harmonizedList <- lapply(names(disturbances), function(sectors){
