@@ -103,7 +103,7 @@ This module contains only one event, named `loadAndHarmonizeDisturbanceDT`. This
  
 2. Wrap `terra` objects: the function `wrapTerraList()` wraps and saves the created disturbance list (`disturbances`) as `terra` objects cannot be directly saved as other spatial object formats. The speed increase when using `terra`, however, is worth the additional step.  
 
-3. Harmonize the disturbance list: the function `hamononizeList()` is responsible for generating the `disturbanceList` object. This is where the unification of different sub-sectors that can be simulated together occurs.  
+3. Harmonize the disturbance list: the function `harmonizeList()` is responsible for generating the `disturbanceList` object. This is where the unification of different sub-sectors that can be simulated together occurs.  
 
 # Data dependencies
 
