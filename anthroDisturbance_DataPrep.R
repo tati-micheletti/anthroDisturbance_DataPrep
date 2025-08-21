@@ -223,7 +223,7 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
                                                   rasterToMatch = sim$rasterToMatch,
                                                   checkDisturbanceProportions = P(sim)$checkDisturbanceProportions)
       
-      sim$disturbanceList <- hamononizeList(disturbances = sim$disturbances, 
+      sim$disturbanceList <- harmonizeList(disturbances = sim$disturbances, 
                                             whatNotToCombine = P(sim)$whatNotToCombine)
     },
     warning(paste("Undefined event type: \'", current(sim)[1, "eventType", with = FALSE],
