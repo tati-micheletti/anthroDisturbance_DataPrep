@@ -1,8 +1,3 @@
-library(testthat)
-library(terra)
-library(data.table)
-library(mockery)
-library(sf)
 
 testthat::test_that("createDisturbanceList: basic structure, subsetting, and combining", {
   skip_on_cran()

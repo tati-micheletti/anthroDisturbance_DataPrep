@@ -77,7 +77,7 @@ checkDisturbanceProportions <- function(DT,
     bLay <- terra::buffer(lay, width = 500)
     toc()
     terra::writeVector(bLay, filename = flNm,
-                       filetype = "ESRI Shapefile")
+                       filetype = "ESRI Shapefile", overwrite = TRUE)
     } else {
     bLay <- vect(fullFlnmSHP)
   }
@@ -89,7 +89,7 @@ checkDisturbanceProportions <- function(DT,
     bLayRas <- fasterize::fasterize(sf = bLaySF, raster = rasterToMatchR)
     names(bLayRas) <- layName
     terra::writeRaster(bLayRas, filename = fullFlnmTIF,
-                       filetype = "GTiff")
+                       filetype = "GTiff", overwrite = TRUE)
     } else {
       bLayRas <- rast(fullFlnmTIF)
     }
