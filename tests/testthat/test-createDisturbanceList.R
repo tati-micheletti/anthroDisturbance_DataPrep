@@ -484,4 +484,3 @@ test_that("multiple dataName outputs are isolated", {
   expect_true(all(out$forestry$cutblocks$type=="F"))
   expect_true(all(out$mining$cutblocks$type=="M"))
 })
-
