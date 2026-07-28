@@ -3,7 +3,7 @@
 
 ### Setup ######################################################################
 # List of packages to install and load
-pkgs <- c("covr", "DT", "htmltools", "htmlwidgets", "testthat", "terra", "data.table", "qs", "sf", "withr", "reproducible", "raster", "tictoc", "mockery", "Require", "fasterize")
+pkgs <- c("covr", "DT", "htmltools", "htmlwidgets", "testthat", "terra", "data.table", "sf", "withr", "reproducible", "raster", "tictoc", "mockery", "Require", "fasterize")
 # Check which packages are not installed
 to_install <- setdiff(pkgs, rownames(installed.packages()))
 

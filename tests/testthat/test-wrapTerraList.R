@@ -70,7 +70,8 @@ test_that("theList.qs manifest has correct structure", {
              c = list(d = create_dummy_vect()))
   suppressWarnings(wrapTerraList(tv, generalPath = tmp, zipFiles = TRUE))
   
-  manifest <- qread(file.path(tmp, "theList.qs"))
+  # manifest <- qread(file.path(tmp, "theList.qs"))
+  manifest <- readRDS(file.path(tmp, "theList.rds"))
   expect_named(manifest, names(tv))
   for (grp in names(tv)) {
     expect_named(manifest[[grp]], names(tv[[grp]]))
