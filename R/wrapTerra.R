@@ -1,3 +1,6 @@
+# [EDIT-6] qs/GoogleDrive removed: identical to potentialResourcesNT_DataPrep/R/wrapTerra.R (.rds + Zenodo)
+# DEPRECATED. Kept for historical records on how the wrapping was performed
+# REASON: qs has been dprecated
 # wrapTerraList <- function(terraList, generalPath, zipFiles = FALSE, uploadZip = NULL){
 #   Require("stringi")
 #   Require("zip")
@@ -37,19 +40,17 @@ unwrapTerraList <- function(terraList, generalPath){
   updatePath <- FALSE
   if (all(!is.list(terraList),
           !file.exists(file.path(generalPath, "theList.rds")))) {
-    message(paste0("The terraList file provided seems to be a google drive link. The contents will be",
+    message(paste0("The terraList file provided seems to be a link to the archive. The contents will be",
                    " downloaded and extracted before recovering."))
-    # If we pass a URL for the file instead of a list, then first we need to download
-    # the file, unzip, and then we update the terraList with the unzipped file theList.rds
-    drive_download(file = as_id(terraList), path = file.path(generalPath, "disturbanceList.zip"))
-    unzip(zipfile = file.path(generalPath, "disturbanceList.zip"), 
-          exdir = generalPath, 
-          junkpaths = TRUE)
-    terraList <- readRDS(file.path(generalPath, "theList.rds"))
+    terraList <- prepInputs(url = terraList,
+               archive = "disturbanceList.zip",
+               targetFile = "theList.rds",
+               fun = "readRDS")
     updatePath <- TRUE
   } else {
     if (all(!is.list(terraList),
             file.exists(file.path(generalPath, "theList.rds")))){
+
       # When the path to the object is being passed
       terraList <- readRDS(file.path(generalPath, "theList.rds"))
       updatePath <- TRUE
@@ -63,10 +64,10 @@ unwrapTerraList <- function(terraList, generalPath){
       message(paste0("Recovering ", names(terraList[[index1]][[index2]])))
       if (updatePath){
         print(paste0("terraList was a link. Fixing paths for ", index2))
-        pth <- dirname(terraList[[index1]][[index2]])
-        terraList[[index1]][[index2]] <- gsub(x = terraList[[index1]][[index2]],
-                                              pattern = pth,
-                                              replacement = generalPath)
+        # [EDIT-7] gsub(pattern = dirname(.)) is a regex: dirname is "." for the flat Zenodo
+        # zip, which matches every character and repeats generalPath. Use basename instead.
+        terraList[[index1]][[index2]] <- file.path(generalPath,
+                                                   basename(terraList[[index1]][[index2]]))
       }
       obj2 <- readRDS(terraList[[index1]][[index2]])
       return(terra::vect(obj2))
