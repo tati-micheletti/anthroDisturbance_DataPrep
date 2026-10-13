@@ -75,7 +75,7 @@ jobs:
           options(repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/noble/2026-01-05"))
           cran_packages <- c(
             "covr", "testthat", "withr", "terra", "data.table",
-            "qs", "sf", "reproducible", "raster", "mockery",
+            "sf", "reproducible", "raster", "mockery",
             "Require", "fasterize", "xml2", "digest", "tictoc",
             "DT", "htmltools", "htmlwidgets", "BH", "RApiSerialize",
             "Rcpp", "RcppParallel", "stringfish", "stringi",
@@ -104,7 +104,7 @@ jobs:
           suppressPackageStartupMessages({
             pkgs <- c(
               "covr", "DT", "htmltools", "htmlwidgets", "testthat",
-              "terra", "data.table", "qs", "sf", "withr", "reproducible",
+              "terra", "data.table", "sf", "withr", "reproducible",
               "raster", "tictoc", "mockery", "Require", "fasterize"
             )
             invisible(lapply(pkgs, library, character.only = TRUE))

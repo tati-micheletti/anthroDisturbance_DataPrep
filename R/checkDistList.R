@@ -32,9 +32,9 @@ checkDistList <- function(distList,
   } else {
     stop("disturbance list seems to have less than 2 levels. Please Debug.")
   }
-  tList <- wrapTerraList(terraList = L1,
-                         generalPath = generalPath)
-  # qs::qsave(tList, listFileName)
+  # terra objects hold external pointers: wrap them before saving as .rds
+  # (recover with terra::unwrap()). qs and wrapTerraList() are no longer used.
+  tList <- lapply(L1, function(x) lapply(x, terra::wrap))
   saveRDS(tList, listFileName)
   return(L1)
 }
