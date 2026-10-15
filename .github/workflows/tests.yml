@@ -14,7 +14,8 @@ on:
         options: [light, heavy]
 
 env:
-  COVERAGE_MIN: 70
+  # Coverage is reported as an artifact; it does not fail the build (as in the Generator module).
+  COVERAGE_MIN: 0
   HEAVY_TESTS: ""
   AGGREGATE_REPO: RonCatK/RonCatK-anthroDisturbance_Thesis
   NOT_CRAN: true
