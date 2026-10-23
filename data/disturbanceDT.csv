@@ -30,8 +30,6 @@ roads,Road,Class,roads,linearDisturbances_NT1_BCR6_clipped.shp,shapefile,https:/
 forestry,Cutblock,Class,cutblocks,NorthwestTerritories_15m_Disturb_Perturb_Poly.shp,shapefile,https://zenodo.org/records/20276320/files/NorthwestTerritories_15m_Disturb_Perturb_Poly.zip
 forestry,Cutblock,Class,cutblocks,polygonalDisturbances_NT1_BCR6_clipped.shp,shapefile,https://zenodo.org/records/20276369/files/polygonalDisturbances_NT1_BCR6_clipped.zip
 forestry,potentialCutblocks,,potentialCutblocks,NT_FORCOV.shp,shapefile,https://zenodo.org/records/20390000/files/NT_FORCOV.zip
-forestry,potentialCutblocks,,potentialCutblocks,Permit_Area.shp,shapefile,https://mvlwb.ca/Documents/MV2015W0018/MV2015W0018%20-%20Digaa%20Enterprises%20Shapefiles.zip
-forestry,potentialCutblocks,,potentialCutblocks,Timberworks_LandUsePermitArea.shp,shapefile,https://zenodo.org/records/20276451/files/Timberworks_LandUsePermitArea.zip
 forestry,Cutblock,,cutblocks,CutblocksHistory_UpdatedJan2022.shp,shapefile,https://zenodo.org/records/20390196/files/CutblocksHistory_UpdatedJan2022.zip
 settlements,Railway,Class,otherLines,linearDisturbances_NT1_BCR6_clipped.shp,shapefile,https://zenodo.org/records/20276162/files/linearDisturbances_NT1_BCR6_clipped.zip
 settlements,Unknown,Class,otherLines,linearDisturbances_NT1_BCR6_clipped.shp,shapefile,https://zenodo.org/records/20276162/files/linearDisturbances_NT1_BCR6_clipped.zip
