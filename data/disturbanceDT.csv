@@ -1,5 +1,5 @@
 dataName,classToSearch,fieldToSearch,dataClass,fileName,dataType,URL
-Energy,windTurbineDB,,windTurbines,wind_turbine_database_en.gdb.zip,gdb,https://ftp.cartes.canada.ca/pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/wind_turbine_database_en.gdb.zip
+Energy,windTurbineDB,,windTurbines,wind_turbine_database_en.gdb.zip,gdb,https://zenodo.org/records/23659898/files/wind_turbine_database_en.gdb.zip
 Energy,E1,,potentialWindTurbines,windLayers_NWT.zip,mif,https://zenodo.org/records/20275948/files/windLayers_NWT.zip
 Energy,Powerline,Class,powerLines,NorthwestTerritories_15m_Disturb_Perturb_Line.shp,shapefile,https://zenodo.org/records/20276072/files/NorthwestTerritories_15m_Disturb_Perturb_Line.zip
 Energy,Powerline,Class,powerLines,linearDisturbances_NT1_BCR6_clipped.shp,shapefile,https://zenodo.org/records/20276162/files/linearDisturbances_NT1_BCR6_clipped.zip
