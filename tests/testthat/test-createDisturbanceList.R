@@ -143,7 +143,7 @@ testthat::test_that("createDisturbanceList: uses on-disk cached shapefiles on se
   expect_equal(nrow(out1$forestry$cutblocks), nrow(out2$forestry$cutblocks))
 })
 
-test_that("createDisturbanceList: rbind failure → falls back to first layer", {
+test_that("createDisturbanceList: each classToSearch stays a layer of its own, whatever its geometry", {
   skip_on_cran()
 
   rtm <- rast(nrows = 5, ncols = 5, xmin=0, xmax=50, ymin=0, ymax=50, vals=1)
@@ -170,7 +170,7 @@ test_that("createDisturbanceList: rbind failure → falls back to first layer", 
                               studyArea, rasterToMatch, destinationPath,
                               fun, overwrite = FALSE, ...) {
     if (url == "vec:A") return(polyA(crs(studyArea)))
-    if (url == "vec:B") return(lineB(crs(studyArea)))  # different geometry → rbind error
+    if (url == "vec:B") return(lineB(crs(studyArea)))  # different geometry, never combined with A
     stop("Unexpected URL")
   }
   fake_checkPath <- function(path, create = FALSE) {
@@ -185,13 +185,120 @@ test_that("createDisturbanceList: rbind failure → falls back to first layer", 
   out <- f(DT, dest, sa, "UT", rtm, FALSE)
   cb  <- out$forestry$cutblocks
   
-  # Expect it took the first layer (polygon with keepA), because rbind failed
+  # A and B are separate entries named cutblocks; `$` returns the first (polygon with keepA)
   expect_s4_class(cb, "SpatVector")
   expect_equal(geomtype(cb), "polygons")
   expect_true("keepA" %in% names(cb))
   expect_false("keepB" %in% names(cb))
 })
 
+
+test_that("createDisturbanceList: layers of one class that cannot be combined stop the run", {
+  skip_on_cran()
+
+  rtm <- rast(nrows = 5, ncols = 5, xmin = 0, xmax = 50, ymin = 0, ymax = 50, vals = 1)
+  crs(rtm) <- "EPSG:3857"
+  sa <- as.polygons(ext(rtm)); crs(sa) <- crs(rtm)
+  dest <- tempfile("dlX_"); dir.create(dest, recursive = TRUE)
+
+  # one class searched in two files, one of polygons and one of lines
+  DT <- data.table(
+    dataName = "roads", dataClass = "roads",
+    classToSearch = c("roads_roads", "roads_roads"),
+    fieldToSearch = c("DIST_CLASS", "DIST_CLASS"),
+    URL = c("vec:poly", "vec:line"), fileName = NA, dataType = "shapefile"
+  )
+  fake_prep <- function(url, ..., studyArea, rasterToMatch, destinationPath, fun, overwrite = FALSE) {
+    v <- if (url == "vec:poly") {
+      vect(matrix(c(0,0, 10,0, 10,10, 0,10, 0,0), ncol = 2, byrow = TRUE), "polygons",
+           crs = crs(studyArea))
+    } else {
+      vect(matrix(c(20,0, 30,10), ncol = 2, byrow = TRUE), "lines", crs = crs(studyArea))
+    }
+    v$DIST_CLASS <- "roads_roads"; v
+  }
+  fake_check <- function(p, create = FALSE) {
+    if (create && !dir.exists(p)) dir.create(p, TRUE)
+    normalizePath(p, winslash = "/", mustWork = FALSE)
+  }
+  f <- createDisturbanceList
+  stub(f, "prepInputs", fake_prep); stub(f, "checkPath", fake_check)
+
+  err <- expect_error(f(DT, dest, sa, "UT", rtm, FALSE))
+  expect_match(conditionMessage(err), "roads/roads/roads_roads", fixed = TRUE)
+  expect_match(conditionMessage(err), "polygons, lines", fixed = TRUE)
+})
+
+test_that("createDisturbanceList: a layer with no URL does not displace the others of its class", {
+  skip_on_cran()
+
+  rtm <- rast(nrows = 5, ncols = 5, xmin = 0, xmax = 50, ymin = 0, ymax = 50, vals = 1)
+  crs(rtm) <- "EPSG:3857"
+  sa <- as.polygons(ext(rtm)); crs(sa) <- crs(rtm)
+  dest <- tempfile("dlU_"); dir.create(dest, recursive = TRUE)
+
+  DT <- data.table(
+    dataName = "forestry", dataClass = "cutblocks",
+    classToSearch = c("HIGH", "HIGH"), fieldToSearch = c("type", "type"),
+    URL = c(NA, "vec:H"), fileName = NA, dataType = "shapefile"
+  )
+  fake_prep <- function(url, ..., studyArea, rasterToMatch, destinationPath, fun, overwrite = FALSE) {
+    v <- vect(matrix(c(0,0, 10,0, 10,10, 0,10, 0,0), ncol = 2, byrow = TRUE), "polygons",
+              crs = crs(studyArea))
+    v$type <- "HIGH"; v
+  }
+  fake_check <- function(p, create = FALSE) {
+    if (create && !dir.exists(p)) dir.create(p, TRUE)
+    normalizePath(p, winslash = "/", mustWork = FALSE)
+  }
+  f <- createDisturbanceList
+  stub(f, "prepInputs", fake_prep); stub(f, "checkPath", fake_check)
+
+  out <- f(DT, dest, sa, "UT", rtm, FALSE)
+  cb <- out$forestry$cutblocks
+  expect_s4_class(cb, "SpatVector")
+  expect_equal(nrow(cb), 1L)
+})
+
+test_that("createDisturbanceList: a layer the search leaves empty does not stop its class", {
+  skip_on_cran()
+
+  rtm <- rast(nrows = 5, ncols = 5, xmin = 0, xmax = 50, ymin = 0, ymax = 50, vals = 1)
+  crs(rtm) <- "EPSG:3857"
+  sa <- as.polygons(ext(rtm)); crs(sa) <- crs(rtm)
+  dest <- tempfile("dlE_"); dir.create(dest, recursive = TRUE)
+
+  # the lines file holds none of this class; the polygons file does
+  DT <- data.table(
+    dataName = "settlements", dataClass = "otherPolygons",
+    classToSearch = c("settlements_otherPolygons", "settlements_otherPolygons"),
+    fieldToSearch = c("DIST_CLASS", "DIST_CLASS"),
+    URL = c("vec:line", "vec:poly"), fileName = NA, dataType = "shapefile"
+  )
+  fake_prep <- function(url, ..., studyArea, rasterToMatch, destinationPath, fun, overwrite = FALSE) {
+    if (url == "vec:line") {
+      v <- vect(matrix(c(20,0, 30,10), ncol = 2, byrow = TRUE), "lines", crs = crs(studyArea))
+      v$DIST_CLASS <- "settlements_otherLines"
+    } else {
+      v <- vect(matrix(c(0,0, 10,0, 10,10, 0,10, 0,0), ncol = 2, byrow = TRUE), "polygons",
+                crs = crs(studyArea))
+      v$DIST_CLASS <- "settlements_otherPolygons"
+    }
+    v
+  }
+  fake_check <- function(p, create = FALSE) {
+    if (create && !dir.exists(p)) dir.create(p, TRUE)
+    normalizePath(p, winslash = "/", mustWork = FALSE)
+  }
+  f <- createDisturbanceList
+  stub(f, "prepInputs", fake_prep); stub(f, "checkPath", fake_check)
+
+  out <- f(DT, dest, sa, "UT", rtm, FALSE)
+  op <- out$settlements$otherPolygons
+  expect_s4_class(op, "SpatVector")
+  expect_equal(geomtype(op), "polygons")
+  expect_equal(nrow(op), 1L)
+})
 
 test_that("createDisturbanceList: checkDisturbanceProportions is called when flag = TRUE", {
   skip_on_cran()

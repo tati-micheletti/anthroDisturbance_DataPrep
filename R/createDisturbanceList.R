@@ -188,20 +188,22 @@ createDisturbanceList <- function(DT,
           return(lay)
 })
 
-        combining <- tryCatch({
-          do.call(rbind, oneLay)
-          message(crayon::green("All ", length(oneLay), " layers for ",
-                                DC, " can be successfully combined!"))
-          TRUE
-        }, error = function(e) {
-          return(FALSE)
+        # A layer with no URL, or none in the studyArea, is NA: it holds nothing to combine, and
+        # must not displace the layers that do
+        oneLay <- oneLay[!vapply(oneLay, function(x) is.atomic(x) && all(is.na(x)), logical(1))]
+        if (length(oneLay) == 0L) return(NA)
+        # Layers that cannot be combined (e.g., lines and polygons in one class) stop the run:
+        # keeping only one of them would silently drop the others' features
+        lay <- tryCatch(do.call(rbind, oneLay), error = function(e) {
+          types <- vapply(oneLay, function(x) {
+            if (inherits(x, "SpatVector")) terra::geomtype(x) else class(x)[1]
+          }, character(1))
+          stop(DN, "/", DC, "/", CTS, ": its ", length(oneLay), " layers cannot be combined (",
+               paste(types, collapse = ", "), "); a class must hold one geometry type. ",
+               conditionMessage(e), call. = FALSE)
         })
-        if (combining) {
-          lay <- do.call(rbind, oneLay)
-        } else {
-          lay <- oneLay[[1]]
-        }
-        
+        message(crayon::green("All ", length(oneLay), " layers for ",
+                              DC, " can be successfully combined!"))
         return(lay)
       })
       # Remove all NA layers
