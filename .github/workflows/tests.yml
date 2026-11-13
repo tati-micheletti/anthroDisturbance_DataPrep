@@ -87,6 +87,19 @@ jobs:
           if (length(missing)) install.packages(missing)
           RS
 
+      - name: Install anthroDisturbanceUtils
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Rscript --vanilla - <<'RS'
+          options(repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/noble/2026-01-05"))
+          if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+          # helpers shared by the anthropogenic disturbance modules, at a fixed commit
+          remotes::install_github("FOR-CAST/anthroDisturbanceUtils",
+                                  ref = "7c846be45c7cd5cea48b233cd8c21fa45a3610a3",
+                                  upgrade = "never", force = TRUE)
+          RS
+
       - name: Ensure Require present
         run: |
           Rscript - <<'RS'

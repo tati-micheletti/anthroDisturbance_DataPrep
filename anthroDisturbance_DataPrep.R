@@ -28,7 +28,8 @@ defineModule(sim, list(
   documentation = list("README.md", "anthroDisturbance_DataPrep.Rmd"), ## same file
   reqdPkgs = list("SpaDES.core (>=2.0.3.9002)", "ggplot2", 
                   "PredictiveEcology/reproducible", "tictoc",
-                  "terra", "crayon", "stringi", "R.utils"),
+                  "terra", "crayon", "stringi", "R.utils",
+                  "FOR-CAST/anthroDisturbanceUtils"),
   parameters = rbind(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
     defineParameter(".plots", "character", "screen", NA, NA,
@@ -223,8 +224,8 @@ doEvent.anthroDisturbance_DataPrep = function(sim, eventTime, eventType) {
                                                   rasterToMatch = sim$rasterToMatch,
                                                   checkDisturbanceProportions = P(sim)$checkDisturbanceProportions)
       
-      sim$disturbanceList <- harmonizeList(disturbances = sim$disturbances, 
-                                            whatNotToCombine = P(sim)$whatNotToCombine)
+      sim$disturbanceList <- anthroDisturbanceUtils::harmonizeList(disturbances = sim$disturbances, 
+                                                                    whatNotToCombine = P(sim)$whatNotToCombine)
     },
     warning(paste("Undefined event type: \'", current(sim)[1, "eventType", with = FALSE],
                   "\' in module \'", current(sim)[1, "moduleName", with = FALSE], "\'", sep = ""))
